@@ -1,5 +1,6 @@
 
 const requestPromise = require('request-promise')
+const wit = require('../controllers/wit')
 
 const isSubscribe = mode => mode === 'subscribe'
 const isTokenValid = token => token === process.env.FB_VERIFY_TOKEN
@@ -19,6 +20,13 @@ const getWebhook = (req, res) => {
 }
 
 const receivedMessage = event => {
+  const senderId = event.sender.id
+  const recipientId = event.recipient.id
+  const messageId = event.message.id
+  const text = event.message.text
+
+  // Mapped entities
+  const entities = wit.getEntities(text)
 
 }
 
