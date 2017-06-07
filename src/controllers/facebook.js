@@ -26,6 +26,28 @@ const sendTextMessage = (recipientId, messageText) => {
 
 }
 
+const callSendAPI = message => {
+  requestPromise({
+    uri: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: {
+      access_token: process.env.PAGE_ACCESS_TOKEN
+    },
+    method: 'POST',
+    json: message
+  })
+    .then(response => {
+      if (response.statusCode === 200) {
+        const { recipientId, messageId } = response
+
+        console.log(`Successfully sent message with id ${messageId} to recipient ${recipientId}`)
+      }
+    })
+    .catch(error => {
+      console.error('Unable to send message.')
+      console.error(error)
+    })
+}
+
 const postWebhook = (req, res) => {
 
 }
