@@ -1,6 +1,7 @@
 
 const express = require('express')
 const bodyParser = require('body-parser')
+require('dotenv').load()
 
 const router = require('./routes/facebook')
 
