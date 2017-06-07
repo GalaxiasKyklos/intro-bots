@@ -1,6 +1,9 @@
 
 const Wit = require('node-wit').Wit
 
+// Threshold to consider an entity as valid
+const THRESHOLD = 0.66;
+
 class WitControler {
   constructor (token) {
     this.wit = new Wit({
@@ -33,7 +36,10 @@ class WitControler {
 
         for (const entity in entities) {
           if (Object.prototype.hasOwnProperty.call(entities, entity)) {
-            flatEntities[entity] = entities[entity][0].value
+            const firstEnt = entities[entity][0]
+            if (firstEnt.confidence > THRESHOLD) {
+              flatEntities[entity] = firstEnt.value
+            }
           }
         }
 
