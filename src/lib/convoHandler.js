@@ -12,9 +12,9 @@ const hasAdjective = entities => entities.hasOwnProperty('adjective')
 const isUp = string => string === 'up'
 const isDown = string => string === 'down'
 
-const getAnswer = (ansUp, ansDown, ansNone) => {
-  return isUp(answerType) ? ansUp
-  : isDown(answerType) ? ansDown : ansNone
+const getAnswer = (answer, ansUp, ansDown, ansNone) => {
+  return isUp(answer) ? ansUp
+  : isDown(answer) ? ansDown : ansNone
 }
 
 const getFollowersForUser = target => {
@@ -62,18 +62,21 @@ const getServiceStatus = answerType => {
       switch (current) {
         case 'good':
           return getAnswer(
+            answerType,
             'Yes, sir! All good!',
             'Nope, everything is fine.',
             'All is good 👍🏼'
           )
         case 'minor':
           return getAnswer(
+            answerType,
             'Kinda, it\'s having some minor issues.',
             'Most likely, it\'s having some minor issues.',
             'Github is suffering from minor issues. Sorry \'bout that.'
           )
         case 'major':
           return getAnswer(
+            answerType,
             'Ooooh, no. It\'s suffering from biiiig issues.',
             'Sadly, yeah. Everything is on fire',
             'Everything in Github is on fire. Sorry. :('
