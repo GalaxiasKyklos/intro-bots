@@ -2,7 +2,7 @@
 const Wit = require('node-wit').Wit
 
 // Threshold to consider an entity as valid
-const THRESHOLD = 0.66;
+const THRESHOLD = 0.66
 
 class WitControler {
   constructor (token) {

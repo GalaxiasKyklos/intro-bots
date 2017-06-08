@@ -2,6 +2,8 @@
 const requestPromise = require('request-promise')
 const wit = require('../controllers/wit')
 
+const convoHandler = require('../lib/convoHandler')
+
 const isSubscribe = mode => mode === 'subscribe'
 const isTokenValid = token => token === process.env.FB_VERIFY_TOKEN
 
@@ -25,10 +27,30 @@ const receivedMessage = event => {
   const messageId = event.message.id
   const text = event.message.text
 
-  // Mapped entities
-  // const entities = wit.getEntities(text)
+  const message = {
+    senderId,
+    recipientId,
+    messageId,
+    text
+  }
 
-  sendTextMessage(senderId, text)
+  // Mapped entities
+  const entities = wit.getEntities(text)
+  const processedMessage = entities
+    .then(rawEntities => convoHandler.process(
+        rawEntities,
+        message,
+        sendTextMessage
+      )
+    )
+
+  processedMessage
+    .then(response => {
+      sendTextMessage(senderId, response)
+    })
+    .catch(error => {
+      sendTextMessage(senderId, error)
+    })
 }
 
 const sendTextMessage = (recipientId, messageText) => {
@@ -81,7 +103,7 @@ const postWebhook = (req, res) => {
         if (event.message) {
           receivedMessage(event)
         } else {
-          console.log("Webhook received unknown event: ", event)
+          console.log('Webhook received unknown event: ', event)
         }
       })
     })
