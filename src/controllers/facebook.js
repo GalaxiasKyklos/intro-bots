@@ -1,6 +1,7 @@
 
 const requestPromise = require('request-promise')
 const wit = require('../controllers/wit')
+const convoHandler = require('../controllers/convoHandler')
 
 const isSubscribe = mode => mode === 'subscribe'
 const isTokenValid = token => token === process.env.FB_VERIFY_TOKEN
@@ -28,17 +29,35 @@ const receivedMessage = event => {
   // Mapped entities
   const entities = wit.getEntities(text)
 
+  const processedMessage = entities
+    .then(rawEntities => {
+      return convoHandler.process(rawEntities)
+    })
+
+  processedMessage
+    .then(rawMessage => {
+      sendTextMessage(senderId, rawMessage)
+    })
 }
 
 const sendTextMessage = (recipientId, messageText) => {
+  const messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      text: messageText
+    }
+  }
 
+  callSendAPI(messageData)
 }
 
 const callSendAPI = message => {
   requestPromise({
     uri: 'https://graph.facebook.com/v2.6/me/messages',
     qs: {
-      access_token: process.env.PAGE_ACCESS_TOKEN
+      access_token: process.env.FB_PAGE_ACCESS_TOKEN
     },
     method: 'POST',
     json: message
@@ -57,7 +76,21 @@ const callSendAPI = message => {
 }
 
 const postWebhook = (req, res) => {
+  const body = req.body
 
+  if (body.object === 'page') {
+    body.entry.forEach(entry => {
+      entry.messaging.forEach(messagingEvent => {
+        if (messagingEvent.message) {
+          receivedMessage(messagingEvent)
+        } else {
+          console.log('The webhook received other kind of message')
+        }
+      })
+    })
+  }
+
+  res.sendStatus(200)
 }
 
 module.exports = {
